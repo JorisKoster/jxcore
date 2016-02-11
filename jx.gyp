@@ -106,6 +106,7 @@
     ],
 
     'sources': [
+      'src/jx/Proxy/console_log.cc',
       'src/jx/Proxy/EngineLogger.cc',
       'src/jx/extend.cc',
       'src/jx/commons.cc',

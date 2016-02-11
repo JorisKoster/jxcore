@@ -83,14 +83,59 @@ static inline void DebuggerOutput_(const char* ctstr, ...) {
 #define warn_console(...) DebuggerOutput_(__VA_ARGS__)
 #define error_console(...) DebuggerOutput_(__VA_ARGS__)
 #define flush_console(...) DebuggerOutput_(__VA_ARGS__)
-#else
+#elif defined(USE_TRADITIONAL_LOGGERS)
 #define log_console(...) fprintf(stdout, __VA_ARGS__)
 #define flush_console(...)        \
   do {                            \
     fprintf(stdout, __VA_ARGS__); \
     fflush(stdout);               \
-  } while (0)
+      } while (0)
 #define error_console(...) fprintf(stderr, __VA_ARGS__)
 #define warn_console(...) fprintf(stderr, __VA_ARGS__)
+#else
+#include <stdarg.h>
+typedef int (*consoleHandler)(int lvl, const char* format, va_list argList);
+
+class ConsoleLogger{
+public:
+    enum LogLevel { LOG_INFO = 0, LOG_WARN = 1, LOG_ERROR = 2};
+public:
+    static consoleHandler handle;
+};
+
+static inline int log_console(const char *format, ...){
+    va_list args;
+    va_start(args, format);
+    int ret = ConsoleLogger::handle(ConsoleLogger::LOG_INFO, format, args);
+    va_end(args);
+    return ret;
+}
+
+static inline int flush_console(const char *format, ...){
+    va_list args;
+    va_start(args, format);
+    int ret = ConsoleLogger::handle(ConsoleLogger::LOG_INFO, format, args);
+    va_end(args);
+    return ret;
+}
+
+static inline int error_console(const char *format, ...){
+    va_list args;
+    va_start(args, format);
+    int ret = ConsoleLogger::handle(ConsoleLogger::LOG_ERROR, format, args);
+    va_end(args);
+    return ret;
+}
+
+static inline int warn_console(const char *format, ...){
+    va_list args;
+    va_start(args, format);
+    int ret = ConsoleLogger::handle(ConsoleLogger::LOG_WARN, format, args);
+    va_end(args);
+    return ret;
+}
+
+extern int defaultConsoleHandler(int lvl, const char* format, va_list argList);
 #endif
-#endif
+
+#endif // end #ifndef SRC_JX_PROXY_H_
