@@ -167,6 +167,11 @@ int JX_GetThreadId() {
   return engine->threadId_;
 }
 
+void JX_SetConsoleHandler(JX_CONSOLE_HANDLER consoleHandler)
+{
+    ConsoleLogger::handle = (consoleHandler ? consoleHandler : defaultConsoleHandler);
+}
+
 void JX_InitializeOnce(const char *home_folder) {
   JXEngine::DefineGlobals();
 #if defined(__IOS__) || defined(__ANDROID__) || defined(DEBUG)

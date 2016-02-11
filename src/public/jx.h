@@ -11,6 +11,23 @@ extern "C" {
 
 typedef void (*JX_CALLBACK)(JXValue *result, int argc);
 
+enum JX_LogLevel{
+    LL_INFO = 0,
+    LL_WARN = 1,
+    LL_ERROR = 2
+};
+typedef int(*JX_CONSOLE_HANDLER)(int lvl, const char* format, va_list argList);
+
+// set the JX Console handler, usefull to override the default behaviour to 
+// report information to stdout/stderr. Also receives the java-script call
+//  console.log('Hello World');
+// Call JX_SetConsoleHandler before any other function to ensure
+// all logging is redirected to your handler. Calling this method with a null
+// argument will reset the handler to default. 
+JXCORE_EXTERN(void)
+JX_SetConsoleHandler(JX_CONSOLE_HANDLER consoleHandler);
+
+
 // Call method below only once per app. to initialize JXcore
 JXCORE_EXTERN(void)
 JX_InitializeOnce(const char *home_folder);
