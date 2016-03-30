@@ -40,6 +40,10 @@ JX_Initialize(const char *home_folder, JX_CALLBACK callback);
 JXCORE_EXTERN(void)
 JX_InitializeNewEngine();
 
+// Per each native thread, you should initialize a new JXcore engine
+JXCORE_EXTERN(void)
+JX_InitializeNewEngineEx(int argc, char *argv[]);
+
 // Evaluates a JavaScript code on the fly.
 // Remarks:
 // 1 - returns false if compilation fails or an internal issue happens

@@ -143,19 +143,23 @@ void JX_SetNativeMethod(JXValue *value, const char *name,
 }
 
 void JX_InitializeNewEngine() {
-  auto_lock locker_(CSLOCK_RUNTIME);
-  JXEngine *engine = JXEngine::ActiveInstance();
-  const int threadId = node::commons::threadIdFromThreadPrivate();
-  if (engine != NULL && threadId == engine->threadId_) {
-    warn_console(
-        "(JX_InitializeNewEngine) Did you forget destroying the existing "
-        "JXEngine instance for this "
-        "thread?\n");
-    return;
-  }
+    JX_InitializeNewEngineEx(2, &app_args[0]);
+}
 
-  engine = new jxcore::JXEngine(2, app_args, false);
-  engine->Initialize();
+void JX_InitializeNewEngineEx(int argc, char *argv[]) {
+    auto_lock locker_(CSLOCK_RUNTIME);
+    JXEngine *engine = JXEngine::ActiveInstance();
+    const int threadId = node::commons::threadIdFromThreadPrivate();
+    if (engine != NULL && threadId == engine->threadId_) {
+        warn_console(
+            "(JX_InitializeNewEngine) Did you forget destroying the existing "
+            "JXEngine instance for this "
+            "thread?\n");
+        return;
+    }
+
+    engine = new jxcore::JXEngine(argc, argv, false);
+    engine->Initialize();
 }
 
 int JX_GetThreadId() {

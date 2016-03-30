@@ -411,6 +411,8 @@ class AutoScope {
 };
 
 JXEngine::~JXEngine() {
+  free(this->argv_);
+
   if (threadId_ != 0) {
     customLock(CSLOCK_JOBS);
     jx_engine_map::iterator it = jx_engine_instances.find(threadId_);
@@ -420,6 +422,7 @@ JXEngine::~JXEngine() {
 
   ENGINE_PRINT_LOGS();
 }
+
 
 JXEngine::JXEngine(node::commons *com) {
   ENGINE_LOG_THIS("JXEngine", "JXEngine(com)");
@@ -438,7 +441,7 @@ JXEngine::JXEngine(node::commons *com) {
   assert(!jxcore_was_shutdown_ && "JXcore engine was already shutdown\n");
   self_hosted_ = jx_engine_instances[0]->self_hosted_;
   argc_ = jx_engine_instances[0]->argc_;
-  argv_ = jx_engine_instances[0]->argv_;
+  argv_ = copy_argv(jx_engine_instances[0]->argc_, jx_engine_instances[0]->argv_);
 }
 
 JXEngine::JXEngine(int argc, char **argv, bool self_hosted) {
@@ -466,7 +469,7 @@ JXEngine::JXEngine(int argc, char **argv, bool self_hosted) {
   assert(!jxcore_was_shutdown_ && "JXcore engine was already shutdown\n");
 
   argc_ = argc;
-  argv_ = argv;
+  argv_ = copy_argv(argc, argv);
   main_node_ = NULL;
   self_hosted_ = self_hosted;
   entry_file_name_ = "";
